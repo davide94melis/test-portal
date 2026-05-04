@@ -1,0 +1,58 @@
+{
+  "version": "1.0",
+  "nome": "monitoring-v2",
+  "data_creazione": "2026-05-04",
+  "creato_da": "davide94melis@gmail.com",
+  "stato_pipeline": "onboard",
+  "codebase": [
+    {
+      "nome": "back end",
+      "sigla": "BE"
+    },
+    {
+      "nome": "front end (web)",
+      "sigla": "FE"
+    },
+    {
+      "nome": "email manager",
+      "sigla": "EM"
+    },
+    {
+      "nome": "document manager",
+      "sigla": "DM"
+    }
+  ],
+  "documenti": [],
+  "team": [],
+  "review": {
+    "data": null,
+    "esito": null,
+    "problemi": [],
+    "assunzioni": [],
+    "disallineamenti_codice": []
+  },
+  "qa": {
+    "criteri_accettazione": []
+  },
+  "gap_analysis": {
+    "data": null,
+    "matrice": [],
+    "gap_aperti": []
+  },
+  "piano": {
+    "approvato": false,
+    "data_approvazione": null,
+    "approvato_da": null,
+    "stream": [],
+    "task": []
+  },
+  "timeline": [
+    {
+      "data": "2026-05-04T21:43:17.653Z",
+      "attore": "davide94melis@gmail.com",
+      "ruolo": "funzionale",
+      "azione": "BR creato",
+      "stage": "onboard"
+    }
+  ]
+}
