@@ -53,6 +53,13 @@
       "ruolo": "funzionale",
       "azione": "BR creato",
       "stage": "onboard"
+    },
+    {
+      "data": "2026-05-05T08:15:00.000Z",
+      "attore": "davide94melis@gmail.com",
+      "ruolo": "TL/PM",
+      "azione": "Avviato review documentazione",
+      "stage": "onboard → review"
     }
   ]
 }
