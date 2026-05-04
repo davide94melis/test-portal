@@ -3,7 +3,7 @@
   "nome": "monitoring-v2",
   "data_creazione": "2026-05-04",
   "creato_da": "davide94melis@gmail.com",
-  "stato_pipeline": "onboard",
+  "stato_pipeline": "review",
   "codebase": [
     {
       "nome": "back end",
@@ -25,11 +25,269 @@
   "documenti": [],
   "team": [],
   "review": {
-    "data": null,
-    "esito": null,
-    "problemi": [],
-    "assunzioni": [],
-    "disallineamenti_codice": []
+    "data": "2026-05-05",
+    "esito": "con_bloccanti",
+    "problemi": [
+      {
+        "id": "B-001",
+        "titolo": "Formato ID Pratica incoerente tra documenti e sezioni",
+        "categoria": "Incoerenza",
+        "bloccante": true,
+        "dove": "BR sez. 3 (ID \"M1\"), BR sez. 8.6 (ID \"P1\"), Mockup slide 3-5 (ID \"Prat001\")",
+        "problema": "Lo stesso concetto — l'identificativo univoco della pratica di monitoraggio — ha tre formati diversi: \"M1\" (BR sez. 1-7), \"P1\" (BR sez. 8.6), \"Prat001\" (Mockup). Non è chiaro quale sia il formato definitivo, se la generazione è automatica o manuale, e quale pattern di numerazione si debba usare.",
+        "impatto": "Senza un formato definito, non si può progettare il sistema di generazione ID, la ricerca, il display e l'integrazione COVNO.",
+        "domanda": "Qual è il formato definitivo dell'ID pratica? La generazione è automatica (auto-incrementale, sequenziale) o segue un pattern specifico? Il formato deve essere coerente con quello delle pratiche nelle altre fasi (SACE, Booking, ecc.)?",
+        "risposta": null
+      },
+      {
+        "id": "B-002",
+        "titolo": "Formato ID Evento incoerente e struttura gerarchica ambigua",
+        "categoria": "Incoerenza",
+        "bloccante": true,
+        "dove": "BR sez. 3 (formato \"M3C2E4\"), Mockup slide 8 (formato \"E001\"), Mockup slide 12-15 (formato \"Mon001\")",
+        "problema": "L'ID dell'evento di monitoraggio ha almeno tre formati: \"M3C2E4\" (BR, struttura gerarchica Pratica-Covenant-Evento), \"E001\" (Mockup), \"Mon001\" (Mockup). La struttura gerarchica del BR è funzionalmente ricca ma diversa da qualsiasi formato nel mockup.",
+        "impatto": "La struttura dell'ID determina il modello dati (relazioni tra entità), la navigazione nell'interfaccia, e la logica di generazione.",
+        "domanda": "Qual è il formato definitivo dell'ID evento? Deve essere gerarchico (incorporando pratica e covenant) o flat? Se flat, come si collega all'evento il covenant e la pratica di appartenenza?",
+        "risposta": null
+      },
+      {
+        "id": "B-003",
+        "titolo": "Sovrapposizione tra stati \"Da attenzionare\" e \"In Scadenza\" nel donut chart",
+        "categoria": "Ambiguità",
+        "bloccante": true,
+        "dove": "BR sez. 8.1 (donut 4 segmenti), BR sez. 5 (macchina stati 6 stati), Macchina Stati XLSX",
+        "problema": "Il donut chart mostra 4 segmenti ma la macchina stati definisce 6 stati. \"Fuori Soglia\" e \"Conclusa\" non appaiono nel donut. Inoltre, \"Da attenzionare\" e \"In Scadenza\" hanno trigger che possono sovrapporsi temporalmente.",
+        "impatto": "Senza regole di priorità tra stati, il donut mostra dati inaffidabili. Senza sapere se \"Fuori Soglia\" e \"Conclusa\" sono inclusi o esclusi, i totali non tornano.",
+        "domanda": "(a) Come si mappano i 6 stati ai 4 segmenti del donut? (b) Se un covenant è contemporaneamente \"In Scadenza\" e \"Da attenzionare\", quale stato prevale? (c) Le pratiche \"Conclusa\" escono dal donut? (d) \"Fuori Soglia\" dove va nel donut?",
+        "risposta": null
+      },
+      {
+        "id": "B-004",
+        "titolo": "Meccanismo di aggiornamento real-time della dashboard non specificato",
+        "categoria": "Gap funzionale",
+        "bloccante": true,
+        "dove": "BR sez. 8.1 (\"valori aggiornati in tempo reale\"), Mockup slide 2-3",
+        "problema": "Il BR afferma che il donut chart deve aggiornarsi \"in tempo reale\" ma non specifica il meccanismo tecnico (WebSocket, SSE, polling), la granularità, né se \"tempo reale\" significa sub-secondo o near-real-time.",
+        "impatto": "WebSocket richiede infrastruttura dedicata; polling può bastare ma va dimensionato. La piattaforma attuale non ha precedenti di comunicazione real-time.",
+        "domanda": "Cosa si intende per \"aggiornato in tempo reale\"? È accettabile un refresh automatico ogni N minuti? L'aggiornamento riguarda solo il donut o l'intera dashboard?",
+        "risposta": null
+      },
+      {
+        "id": "B-005",
+        "titolo": "Pipeline GenAI per monitoraggio non definito nel documento Tracciati",
+        "categoria": "Gap funzionale",
+        "bloccante": true,
+        "dove": "BR sez. 6, Tracciati GenAI XLSX (solo SACE/Pre-Closing/Booking/Post-Closing), Mockup slide 18-22",
+        "problema": "Il BR descrive un flusso GenAI per estrarre valori covenant dai certificati di conformità, ma il documento Tracciati non contiene nessun pipeline per la fase di monitoraggio. Il pipeline Post-Closing ha struttura simile ma non è chiaro se sia riutilizzabile.",
+        "impatto": "Senza la definizione del pipeline GenAI (input, campi, output, mapping), non è possibile pianificare l'integrazione GenAI per il monitoraggio.",
+        "domanda": "(a) Il monitoraggio riutilizza il pipeline GenAI del Post-Closing (stessi campi COVENANT_NUM_*, COVENANT_DESC_*, OBBLIGO_INF_*)? (b) Se no, quali campi deve estrarre e da quale tipo di documento? (c) Il documento Tracciati verrà aggiornato?",
+        "risposta": null
+      },
+      {
+        "id": "B-006",
+        "titolo": "Formato file COVNO e regole di validazione non specificati",
+        "categoria": "Gap funzionale",
+        "bloccante": true,
+        "dove": "BR sez. 8.6 (Sincronizzazione COVNO), Mockup slide 25-27",
+        "problema": "Il BR descrive la sincronizzazione con COVNO tramite upload di file, ma non specifica: formato file (CSV, XLSX, XML?), schema, regole di validazione, comportamento in caso di errore, campo di matching (tracking ID = bookingTrackingId?), frequenza di sincronizzazione.",
+        "impatto": "Senza queste specifiche, non si può implementare il parser, la validazione, la gestione errori e il matching. COVNO è la fonte dati dei covenant da monitorare.",
+        "domanda": "(a) Qual è il formato del file COVNO? (b) Qual è lo schema (colonne, tipi, campi obbligatori)? (c) Come si mappa un record COVNO a una pratica (via tracking ID del booking)? (d) In caso di errore, l'intero upload fallisce o si prosegue con i record validi? (e) Può ISP fornire un file di esempio?",
+        "risposta": null
+      },
+      {
+        "id": "B-007",
+        "titolo": "Tipo documento e output GenAI per certificati di conformità non definiti",
+        "categoria": "Gap funzionale",
+        "bloccante": true,
+        "dove": "BR sez. 6, Mockup slide 18-22",
+        "problema": "Il BR descrive il caricamento di un \"certificato di conformità\" per estrazione GenAI ma non definisce: tipo documento accettato (PDF, DOCX, scansione?), struttura attesa, formato output dell'estrazione, livello di confidenza, se è uno per covenant o per pratica.",
+        "impatto": "Il flusso GenAI è il cuore dell'automazione del monitoraggio. Senza sapere input e output, non si può progettare prompt, parser, né interfaccia di validazione.",
+        "domanda": "(a) Che tipo di documento è il \"certificato di conformità\"? (b) Ha formato standard o varia per cliente/banca? (c) Un certificato contiene i valori di un solo covenant o di tutti? (d) Quali campi deve estrarre la GenAI? (e) Come si presenta il risultato all'operatore per validazione?",
+        "risposta": null
+      },
+      {
+        "id": "NB-001",
+        "titolo": "Colonna \"# Documenti in Lavorazione\" nel mockup assente dal BR",
+        "categoria": "Incoerenza",
+        "bloccante": false,
+        "dove": "Mockup slide 3-5 (tabella pratiche recenti), BR sez. 8",
+        "problema": "Il mockup mostra una colonna \"# Documenti in Lavorazione\" nelle tabelle della dashboard che non è descritta nel BR.",
+        "domanda": "La colonna \"# Documenti in Lavorazione\" va inclusa? Se sì, cosa conta esattamente?",
+        "risposta": null
+      },
+      {
+        "id": "NB-002",
+        "titolo": "Macchina stati: versioni \"(old)\" vs versioni correnti",
+        "categoria": "Ambiguità",
+        "bloccante": false,
+        "dove": "Macchina Stati XLSX",
+        "problema": "Il documento della macchina stati contiene sia le versioni attuali sia le versioni precedenti con suffisso \"(old)\". Non c'è indicazione su quali siano le definitive.",
+        "domanda": "Le versioni senza suffisso \"(old)\" sono le definitive? Le versioni \"(old)\" possono essere ignorate?",
+        "risposta": null
+      },
+      {
+        "id": "NB-003",
+        "titolo": "Trigger \"Da attenzionare\": soglia 10% e regola 30%+40% non formalizzate",
+        "categoria": "Ambiguità",
+        "bloccante": false,
+        "dove": "Macchina Stati XLSX, BR sez. 5",
+        "problema": "Il trigger per \"Da attenzionare\" usa percentuali (10% soglia, 30% deviazione, 40% delta) senza formule esatte. Non è chiaro se le soglie sono configurabili.",
+        "domanda": "Potete fornire le formule esatte per il calcolo dei trigger \"Da attenzionare\" con un esempio numerico?",
+        "risposta": null
+      },
+      {
+        "id": "NB-004",
+        "titolo": "Flusso \"Salta monitoraggio\" e \"Ignora soglia\": condizioni e permessi",
+        "categoria": "Gap funzionale",
+        "bloccante": false,
+        "dove": "BR sez. 7, Mockup slide 30-32",
+        "problema": "Il BR descrive due flussi di eccezione ma non specifica: chi può attivarli, se richiedono approvazione, se sono reversibili, se c'è un limite, se vengono loggati.",
+        "domanda": "(a) Quali ruoli possono attivare le eccezioni? (b) Servono approvazioni? (c) Sono reversibili? (d) C'è un limite al numero di eccezioni per pratica/covenant?",
+        "risposta": null
+      },
+      {
+        "id": "NB-005",
+        "titolo": "Spread tables: fonte dati e modalità di creazione",
+        "categoria": "Gap funzionale",
+        "bloccante": false,
+        "dove": "BR sez. 7.3, Mockup slide 35-38",
+        "problema": "Il BR indica che Deloitte crea tabelle di spread ma non specifica: fonte dati, chi li crea, relazione con il covenant, formula di calcolo.",
+        "domanda": "(a) I valori di spread vengono inseriti manualmente o importati? (b) Ogni covenant ha la sua tabella di spread o è a livello pratica? (c) C'è una formula di calcolo?",
+        "risposta": null
+      },
+      {
+        "id": "NB-006",
+        "titolo": "Mailing list e notifiche: template e trigger",
+        "categoria": "Gap funzionale",
+        "bloccante": false,
+        "dove": "BR sez. 7.5, Mockup slide 40-42",
+        "problema": "Il BR menziona una mailing list per notifiche ma non specifica: quali eventi attivano notifiche, contenuto/template email, destinatari per tipo evento, configurabilità.",
+        "domanda": "(a) Quali eventi generano notifica email? (b) I template sono gli stessi di altre fasi o dedicati? (c) I destinatari sono fissi o configurabili per evento?",
+        "risposta": null
+      },
+      {
+        "id": "NB-007",
+        "titolo": "Scadenziere: logica di calcolo date e regole di ricorrenza",
+        "categoria": "Ambiguità",
+        "bloccante": false,
+        "dove": "BR sez. 7.4, Mockup slide 33-34",
+        "problema": "Il BR descrive uno scadenziere con periodicità ma non specifica: data base di calcolo, gestione festivi/weekend, significato della scadenza (data upload vs data valore), configurabilità preavviso 30gg.",
+        "domanda": "(a) La data scadenza è calcolata da quale data base? (b) Come si gestiscono festivi/weekend? (c) I 30 giorni di preavviso sono fissi o configurabili?",
+        "risposta": null
+      },
+      {
+        "id": "NB-008",
+        "titolo": "Terminologia \"Pratica\" vs \"Dossier\" vs \"Fascicolo\"",
+        "categoria": "Ambiguità",
+        "bloccante": false,
+        "dove": "BR sez. 1-8, Mockup",
+        "problema": "Il BR alterna tra \"pratica\", \"dossier\" e \"fascicolo\" senza definire se sono sinonimi o concetti distinti.",
+        "domanda": "\"Pratica\", \"dossier\" e \"fascicolo\" sono sinonimi nel contesto del monitoraggio? Quale termine deve apparire nell'interfaccia utente?",
+        "risposta": null
+      }
+    ],
+    "assunzioni": [
+      {
+        "id": "A-001",
+        "problema_rif": "NB-001",
+        "assunzione": "La colonna mostra il conteggio dei certificati di conformità caricati ma non ancora validati (stato \"In attesa di conferma\" + \"Verifica dati in corso\"). Da includere come requisito.",
+        "rischio": "La colonna potrebbe contare qualcosa di diverso o non essere necessaria",
+        "costo_correzione": "Basso"
+      },
+      {
+        "id": "A-002",
+        "problema_rif": "NB-002",
+        "assunzione": "Le versioni senza suffisso \"(old)\" sono le definitive. Le versioni \"(old)\" vengono ignorate.",
+        "rischio": "Se le versioni \"(old)\" contengono logica ancora valida, potremmo perdere requisiti",
+        "costo_correzione": "Medio"
+      },
+      {
+        "id": "A-003",
+        "problema_rif": "NB-003",
+        "assunzione": "Formula: soglia * 0.9 <= valore < soglia. Regola 30%+40%: deviazione >= 30% dal valore target E variazione >= 40% rispetto alla rilevazione precedente. Soglie fisse, non configurabili.",
+        "rischio": "Se le soglie sono configurabili serve un'interfaccia di configurazione. Se le formule sono diverse, la macchina stati si comporta in modo errato",
+        "costo_correzione": "Medio"
+      },
+      {
+        "id": "A-004",
+        "problema_rif": "NB-004",
+        "assunzione": "Le eccezioni richiedono ruolo DTT (Deloitte), non necessitano approvazione, sono reversibili, non hanno limite, e vengono loggate in un audit trail dedicato.",
+        "rischio": "Se servono approvazioni multi-step, serve un workflow aggiuntivo",
+        "costo_correzione": "Medio"
+      },
+      {
+        "id": "A-005",
+        "problema_rif": "NB-005",
+        "assunzione": "I valori di spread sono inseriti manualmente da utenti DTT tramite form. Ogni pratica ha la sua configurazione di spread (covenant-based o temporal-based, non entrambe).",
+        "rischio": "Se i valori vengono importati da file, serve un parser. Se una pratica può avere entrambi i tipi, serve logica aggiuntiva",
+        "costo_correzione": "Medio"
+      },
+      {
+        "id": "A-006",
+        "problema_rif": "NB-006",
+        "assunzione": "Template email dedicati per il monitoraggio. Eventi notificati: cambio stato pratica, scadenza imminente (30gg), eccezione attivata. Destinatari: tutti nella mailing list, non configurabili per tipo evento.",
+        "rischio": "Se i template sono più complessi o le regole di routing diverse, serve rework",
+        "costo_correzione": "Basso"
+      },
+      {
+        "id": "A-007",
+        "problema_rif": "NB-007",
+        "assunzione": "Date scadenza ricorrenti calcolate dalla data di prima rilevazione, avanzando per periodicità. Festivi/weekend: la scadenza non si sposta. Preavviso 30 giorni fisso. La scadenza è la data entro cui il documento deve essere caricato.",
+        "rischio": "Se la base di calcolo è diversa o il preavviso è configurabile, serve rework della logica",
+        "costo_correzione": "Basso"
+      },
+      {
+        "id": "A-008",
+        "problema_rif": "NB-008",
+        "assunzione": "\"Pratica\", \"dossier\" e \"fascicolo\" sono sinonimi. Nell'interfaccia si usa \"Pratica\" per coerenza con il resto della piattaforma e con l'entità Practice nel codice.",
+        "rischio": "Se sono concetti distinti servono entità e UI separate",
+        "costo_correzione": "Alto"
+      }
+    ],
+    "disallineamenti_codice": [
+      {
+        "id": "D-001",
+        "concetto_br": "6 stati monitoraggio: OK, In Scadenza, Da attenzionare, Scaduto, Fuori Soglia, Conclusa",
+        "nel_codice": "PsmStateCodeEnum: nessuno stato con prefisso MONITORING_*",
+        "file": "BE: PsmStateCodeEnum.java",
+        "nota": "Servono nuovi valori enum per tutti e 6 gli stati + gli stati intermedi di processing documento"
+      },
+      {
+        "id": "D-002",
+        "concetto_br": "Fase Monitoring nel PSM",
+        "nel_codice": "BE: PsmPhaseCodeEnum ha MONITORING. FE: psm-phase.enum.ts ha Monitoring e MonitoringOutcome. Ma psm-phase-code.enum.ts nel FE NON ha MONITORING",
+        "file": "BE: PsmPhaseCodeEnum.java, FE: psm-phase-code.enum.ts, psm-phase.enum.ts",
+        "nota": "Il BE è parzialmente allineato, il FE ha una incoerenza interna tra i due enum file"
+      },
+      {
+        "id": "D-003",
+        "concetto_br": "Email di notifica per eventi monitoraggio",
+        "nel_codice": "EmailTemplateEnum: nessun template per monitoraggio. NOTIFY_MONITORING_WEBINARS è per webinar formativi",
+        "file": "BE: EmailTemplateEnum.java",
+        "nota": "Servono nuovi template: scadenza imminente, cambio stato, eccezione attivata, assegnazione documento"
+      },
+      {
+        "id": "D-004",
+        "concetto_br": "GenAI estrazione valori covenant da certificato conformità",
+        "nel_codice": "GenAiFormKeyEnum ha chiavi COVENANT_NUM_*, COVENANT_DESC_*, OBBLIGO_INF_* ma per Post-Closing (BR v28 sez. 3.1.26)",
+        "file": "BE: GenAiFormKeyEnum.java",
+        "nota": "Se il monitoraggio riusa il pipeline Post-Closing, le chiavi esistenti potrebbero bastare. Altrimenti servono nuove chiavi MONITORING_*"
+      },
+      {
+        "id": "D-005",
+        "concetto_br": "Periodicità covenant: annuale, semestrale, trimestrale, mensile, altro",
+        "nel_codice": "MonitoringPeriodicityEnum: ANNUALE, SEMESTRALE, TRIMESTRALE, MENSILE, ALTRO — allineato",
+        "file": "BE: MonitoringPeriodicityEnum.java",
+        "nota": "Unico enum già allineato"
+      },
+      {
+        "id": "D-006",
+        "concetto_br": "Entità monitoraggio: pratica, covenant, evento, scadenziere, spread",
+        "nel_codice": "Nessuna entità dedicata al monitoraggio. Practice.java esiste con discriminator \"C\". monitoring.component.ts nel FE è minimale",
+        "file": "BE: Practice.java, FE: monitoring.component.ts",
+        "nota": "Servono nuove entità: MonitoringPractice, MonitoringCovenant, MonitoringEvent, MonitoringSchedule, MonitoringSpread + controller, service, repository"
+      }
+    ]
   },
   "qa": {
     "criteri_accettazione": []
@@ -60,6 +318,13 @@
       "ruolo": "TL/PM",
       "azione": "Avviato review documentazione",
       "stage": "onboard → review"
+    },
+    {
+      "data": "2026-05-05T09:00:00.000Z",
+      "attore": "davide94melis@gmail.com",
+      "ruolo": "TL/PM",
+      "azione": "Review completata: 7 bloccanti, 8 non bloccanti, 6 disallineamenti codice",
+      "stage": "review"
     }
   ]
 }
